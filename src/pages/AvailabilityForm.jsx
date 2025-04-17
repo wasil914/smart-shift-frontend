@@ -21,16 +21,28 @@ const AvailabilityForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    if (form.preferredShifts.length === 0) {
+      setMessage('Please select at least one preferred shift.');
+      return;
+    }
+  
+    if (form.maxHoursPerWeek < 10 || form.maxHoursPerWeek > 60) {
+      setMessage('Max hours per week must be between 10 and 60.');
+      return;
+    }
+  
     try {
       const token = localStorage.getItem('token');
       const res = await API.post('/availability', form, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
+  
       setMessage(res.data.message);
       setTimeout(() => navigate('/dashboard'), 1000);
     } catch (err) {
-      setMessage('Error saving availability');
+      console.error('❌ Error saving availability:', err.response?.data || err.message);
+      setMessage(err.response?.data?.message || 'Error saving availability');
     }
   };
 

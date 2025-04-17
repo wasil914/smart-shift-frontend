@@ -1,6 +1,11 @@
 import { useContext, useEffect, useState } from 'react';
+import { AgGridReact } from 'ag-grid-react';
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+
 import API from '../utils/axios';
 import { AuthContext } from '../context/AuthContext';
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const ShiftViewer = () => {
   const { user } = useContext(AuthContext);
@@ -10,52 +15,64 @@ const ShiftViewer = () => {
   useEffect(() => {
     const fetchShifts = async () => {
       try {
-        const res = await API.get('/schedule');
-        const allShifts = res.data;
+        const token = localStorage.getItem('token');
+        const res = await API.get('/schedule', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-        // Filter shifts where the logged-in user is assigned
-        const userShifts = allShifts.filter(shift =>
-          shift.assignedEmployees.some(emp => emp._id === user.id)
-        );
-
-        setShifts(userShifts);
-        setLoading(false);
+        console.log('✅ Shifts from server:', res.data);
+        setShifts(res.data);
       } catch (err) {
-        console.error('Error fetching shifts', err);
+        console.error('❌ Error fetching shifts:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchShifts();
-  }, [user.id]);
+    if (user?._id) fetchShifts();
+  }, [user]);
+
+  const columnDefs = [
+    { headerName: 'Day', field: 'day', sortable: true, filter: true },
+    { headerName: 'Shift', field: 'shiftType', sortable: true, filter: true },
+    {
+      headerName: 'Team Members',
+      field: 'assignedEmployees',
+      valueGetter: (params) => {
+        return (params.data.assignedEmployees || [])
+          .filter(emp => {
+            const empId = typeof emp === 'string' ? emp : emp._id;
+            return user.role === 'admin' || empId?.toString() === user._id?.toString();
+          })
+          .map(emp => typeof emp === 'string' ? '[ID] ' + emp : emp.name)
+          .join(', ');
+      },
+      autoHeight: true,
+      wrapText: true,
+    },
+  ];
 
   if (loading) return <p>Loading shifts...</p>;
 
   return (
-    <div>
-      <h2>Your Assigned Shifts</h2>
+    <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+      <h2>
+        {user?.role === 'admin'
+          ? 'All Employee Shifts'
+          : 'Your Assigned Shifts'}
+      </h2>
+
       {shifts.length === 0 ? (
         <p>No shifts assigned this week.</p>
       ) : (
-        <table border="1" cellPadding="10">
-          <thead>
-            <tr>
-              <th>Day</th>
-              <th>Shift</th>
-              <th>Team Members</th>
-            </tr>
-          </thead>
-          <tbody>
-            {shifts.map((shift, index) => (
-              <tr key={index}>
-                <td>{shift.day}</td>
-                <td>{shift.shiftType}</td>
-                <td>
-                  {shift.assignedEmployees.map(emp => emp.name).join(', ')}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <AgGridReact
+          rowData={shifts}
+          columnDefs={columnDefs}
+          pagination={false}
+          domLayout="autoHeight"
+        />
       )}
     </div>
   );

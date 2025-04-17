@@ -9,6 +9,8 @@ import AvailabilityForm from './pages/AvailabilityForm';
 import AdminDashboard from './pages/AdminDashboard';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
+import AdminSettings from './pages/AdminSettings';
+
 
 function App() {
   return (
@@ -24,15 +26,15 @@ function App() {
         </PrivateRoute>
       } />
 
-      <Route path="/shifts" element={
-        <PrivateRoute>
-          <ShiftViewer />
-        </PrivateRoute>
-      } />
-
       <Route path="/availability" element={
         <PrivateRoute>
           <AvailabilityForm />
+        </PrivateRoute>
+      } />
+
+      <Route path="/shifts" element={
+        <PrivateRoute>
+          <ShiftViewer />
         </PrivateRoute>
       } />
 
@@ -42,7 +44,11 @@ function App() {
           <AdminDashboard />
         </AdminRoute>
       } />
-
+      <Route path="/admin/settings" element={
+  <AdminRoute>
+    <AdminSettings />
+  </AdminRoute>
+} />
       <Route path="/admin/schedule" element={
        <AdminRoute>
          <AdminSchedule />
