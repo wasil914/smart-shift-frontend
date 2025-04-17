@@ -1,5 +1,6 @@
 
 // Register.jsx
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
@@ -62,7 +63,7 @@ const Register = () => {
         </form>
         {error && <p style={{ color: 'red', marginTop: '10px', textAlign: 'center' }}>{error}</p>}
         <p className="signup">Already have an account?
-          <a rel="noopener noreferrer" href="/login"> Login</a>
+        <Link to="/login" rel="noopener noreferrer">Login</Link>
         </p>
       </div>
     </StyledWrapper>
