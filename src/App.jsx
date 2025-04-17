@@ -3,6 +3,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ShiftViewer from './pages/ShiftViewer';
+import AdminSchedule from './pages/AdminSchedule';
+
 import AvailabilityForm from './pages/AvailabilityForm';
 import AdminDashboard from './pages/AdminDashboard';
 import PrivateRoute from './components/PrivateRoute';
@@ -21,7 +23,7 @@ function App() {
           <Dashboard />
         </PrivateRoute>
       } />
-      
+
       <Route path="/shifts" element={
         <PrivateRoute>
           <ShiftViewer />
@@ -40,6 +42,13 @@ function App() {
           <AdminDashboard />
         </AdminRoute>
       } />
+
+      <Route path="/admin/schedule" element={
+       <AdminRoute>
+         <AdminSchedule />
+       </AdminRoute>
+        } />
+
     </Routes>
   );
 }
