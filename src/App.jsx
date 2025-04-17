@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import ShiftViewer from './pages/ShiftViewer';
 import AvailabilityForm from './pages/AvailabilityForm';
 import AdminDashboard from './pages/AdminDashboard';
 import PrivateRoute from './components/PrivateRoute';
@@ -18,6 +19,12 @@ function App() {
       <Route path="/dashboard" element={
         <PrivateRoute>
           <Dashboard />
+        </PrivateRoute>
+      } />
+      
+      <Route path="/shifts" element={
+        <PrivateRoute>
+          <ShiftViewer />
         </PrivateRoute>
       } />
 
